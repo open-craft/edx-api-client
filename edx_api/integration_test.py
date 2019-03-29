@@ -357,6 +357,10 @@ def test_get_current_grade():
     assert len(course_grades.all_course_ids) >= 1
     assert 'course-v1:edX+DemoX+Demo_Course' in course_grades.all_course_ids
 
+    student_grades = api.current_grades.get_course_current_grades('course-v1:edX+DemoX+Demo_Course')
+    assert len(student_grades) >= 1
+    assert 'bub' in course_grades.all_usernames
+
 
 @require_integration_settings
 def test_get_current_grade_timeout():

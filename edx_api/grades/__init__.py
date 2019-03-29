@@ -73,4 +73,38 @@ class UserCurrentGrades(object):
                 if error.response.status_code >= 500:
                     raise
 
-        return CurrentGrades(all_current_grades)
+        return CurrentGrades(all_current_grades, restrict_to="username")
+
+    def get_course_current_grades(self, course_id):
+        """
+        Returns a CurrentGrades object for all users in the specified course.
+
+        Args:
+            course_id (str): an edX course ids.
+
+        Returns:
+            CurrentGrades: object representing the student current grades
+
+        Authorization:
+            The authenticated user must have staff permissions to see grades for all users
+            in a course.
+        """
+        resp = self.requester.get(
+            urljoin(
+                self.base_url,
+                '/api/grades/v1/courses/{course_key}/'.format(course_key=course_id)
+            )
+        )
+        resp.raise_for_status()
+        resp_json = resp.json()
+        if 'results' in resp_json:
+            grade_entries = [CurrentGrade(entry) for entry in resp_json["results"]]
+            while resp_json['next'] is not None:
+                resp = self.requester.get(resp_json['next'])
+                resp.raise_for_status()
+                resp_json = resp.json()
+                grade_entries.extend((CurrentGrade(entry) for entry in resp_json["results"]))
+        else:
+            grade_entries = [CurrentGrade(entry) for entry in resp_json]
+
+        return CurrentGrades(grade_entries, restrict_to="course_id")
