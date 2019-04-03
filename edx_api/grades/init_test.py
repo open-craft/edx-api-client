@@ -28,7 +28,7 @@ class GradesApiTestCase(TestCase):
                 os.path.dirname(__file__),
                 "../enrollments/fixtures/user_enrollments.json",
             )
-        ) as file:
+        ) as file:  # pylint: disable=redefined-builtin
             self.enrollment_data = json.load(file)
         self.enrollment_url = six.moves.urllib.parse.urljoin(
             "https://edx.example.com", enrollments.CourseEnrollments.enrollment_url
@@ -100,5 +100,5 @@ class GradesApiTestCase(TestCase):
         """
         with open(
             os.path.join(os.path.dirname(__file__), "fixtures", filename)
-        ) as file:
+        ) as file:  # pylint: disable=redefined-builtin
             return json.load(file)
